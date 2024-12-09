@@ -15,20 +15,17 @@ export class User {
     firstName: string
     @Column({length: 40})
     lastName: string
-    @Column()
+    @Column({default: false})
     deleted: boolean
-    @Column()
+    @Column({unique: true})
     email: string
-    @Column({length: 15})
+    @Column({length: 15, unique: true})
     phone: string
-    @Column({
-        type: "enum",
-        enum: Gender,
-    })
+    @Column({type: "enum", enum: Gender})
     gender: string
     @Column()
     birthdate: Date
-    @Column()
+    @Column({nullable: true})
     picture: string
     @Column()
     password: string

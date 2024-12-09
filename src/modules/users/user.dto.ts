@@ -1,18 +1,32 @@
-import { ApiProperty } from "@nestjs/swagger"
+import { ApiPropertyOptional } from "@nestjs/swagger"
+import { IsEmail, IsEnum, IsMobilePhone, IsOptional } from "class-validator"
+import { Gender } from "./user.entity"
 
 export class UserDto {
-    @ApiProperty()
-    firstName: string
-    @ApiProperty()
-    lastName: string
-    @ApiProperty()
-    email: string
-    @ApiProperty()
-    phone: string
-    @ApiProperty()
-    gender: string
-    @ApiProperty()
-    birthdate: Date
-    @ApiProperty()
-    picture: string
+    @ApiPropertyOptional()
+    firstName?: string
+
+    @ApiPropertyOptional()
+    lastName?: string
+
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsEmail()
+    email?: string
+
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsMobilePhone()
+    phone?: string
+
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsEnum(Gender)
+    gender?: string
+
+    @ApiPropertyOptional()
+    birthdate?: Date
+
+    @ApiPropertyOptional()
+    picture?: string
 }

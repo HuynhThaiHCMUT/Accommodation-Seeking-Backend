@@ -1,26 +1,44 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { IsEmail, IsEnum, IsMobilePhone, IsNotEmpty, MinLength } from "class-validator";
+import { Gender } from "../users/user.entity";
 
 export class SignInDto {
     @ApiProperty()
+    @IsMobilePhone()
     phone: string;
-    @ApiProperty()
+
+    @ApiProperty({ minLength: 8 })
+    @MinLength(8)
     password: string;
 }
 
 export class SignUpDto {
     @ApiProperty()
+    @IsEmail()
     email: string;
+
     @ApiProperty()
+    @MinLength(8)
     password: string;
+
     @ApiProperty()
+    @IsNotEmpty()
     firstName: string;
+
     @ApiProperty()
+    @IsNotEmpty()
     lastName: string;
+
     @ApiProperty()
+    @IsMobilePhone()
     phone: string;
+
     @ApiProperty()
-    birthDate: Date;
+    @IsNotEmpty()
+    birthdate: Date;
+
     @ApiProperty()
+    @IsEnum(Gender)
     gender: string;
 }
 

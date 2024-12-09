@@ -1,8 +1,9 @@
-import bcrypt from 'bcrypt';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+import { Injectable, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
-import { SignInDto, SignUpDto } from './auth.dto';
+import { SignInDto, SignUpDto, TokenDto } from './auth.dto';
+import { User } from '../users/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -11,24 +12,39 @@ export class AuthService {
         private jwtService: JwtService,
     ) {}
 
-    async signIn(signInDto: SignInDto): Promise<string> {
-        const user = await this.usersService.findOne(signInDto.phone);
+    async signIn(signInDto: SignInDto): Promise<TokenDto> {
+        const user = await this.usersService.findOne({phone: signInDto.phone});
+        if (!user) {
+            throw new UnauthorizedException('Incorrect phone number or password');
+        }
         const isMatch = await bcrypt.compare(signInDto.password, user?.password);
         if (!isMatch) {
-            throw new UnauthorizedException();
+            throw new UnauthorizedException('Incorrect phone number or password');
         }
-        const { password, id, ...result } = user;
-        return this.jwtService.signAsync(result);;
+        const { password, ...result } = user;
+        return {
+            token: this.jwtService.sign(result),
+        };
     }
 
-    async signUp(signUpDto: SignUpDto): Promise<string> {
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(signUpDto.password, salt);
+    async signUp(signUpDto: SignUpDto): Promise<TokenDto> {
+        let existed: User;
+        existed = await this.usersService.findOne({email: signUpDto.email});
+        if (existed) {
+            throw new UnprocessableEntityException('Email already exists');
+        }
+        existed = await this.usersService.findOne({phone: signUpDto.phone});
+        if (existed) {
+            throw new UnprocessableEntityException('Phone number already exists');
+        }
+        const hashedPassword = await bcrypt.hash(signUpDto.password, 10);
         const user = await this.usersService.create({
             ...signUpDto,
             password: hashedPassword,
         });
-        const { password, id, ...result } = user;
-        return this.jwtService.signAsync(result);
+        const { password, ...result } = user;
+        return {
+            token: this.jwtService.sign(result),
+        }
     }
 }

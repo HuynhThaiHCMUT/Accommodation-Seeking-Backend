@@ -14,8 +14,7 @@ export class UsersService {
     ) {}
 
     async findOne(findOptions: FindOptionsWhere<User>): Promise<User> {
-        const user = await this.usersRepository.findOneBy(findOptions);
-        return user;
+        return await this.usersRepository.findOneBy(findOptions);
     }
 
     async create(userDto: SignUpDto): Promise<User> {

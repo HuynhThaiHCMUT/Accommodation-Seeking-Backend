@@ -1,12 +1,16 @@
 import { ApiPropertyOptional } from "@nestjs/swagger"
-import { IsEmail, IsEnum, IsMobilePhone, IsOptional } from "class-validator"
+import { IsDateString, IsEmail, IsEnum, IsMobilePhone, IsNotEmpty, IsOptional } from "class-validator"
 import { Gender } from "./user.entity"
 
 export class UserDto {
     @ApiPropertyOptional()
+    @IsOptional()
+    @IsNotEmpty()
     firstName?: string
 
     @ApiPropertyOptional()
+    @IsOptional()
+    @IsNotEmpty()
     lastName?: string
 
     @ApiPropertyOptional()
@@ -25,7 +29,9 @@ export class UserDto {
     gender?: string
 
     @ApiPropertyOptional()
-    birthdate?: Date
+    @IsOptional()
+    @IsDateString()
+    birthdate?: string
 
     @ApiPropertyOptional()
     picture?: string

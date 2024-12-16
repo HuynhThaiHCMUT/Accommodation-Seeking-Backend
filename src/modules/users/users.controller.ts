@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Put, Request, UnauthorizedException } from '@nestjs/common';
-import { UsersService } from './users.service';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { UsersService } from './users.service';
 import { UserDto } from './user.dto';
 import { PostDto } from '../posts/post.dto';
 
@@ -12,7 +12,7 @@ export class UsersController {
     
     @HttpCode(HttpStatus.OK)
     @Get()
-    @ApiOkResponse({ description: 'Get user info', type: UserDto })
+    @ApiOkResponse({ description: 'Get user info successfully', type: UserDto })
     @ApiUnauthorizedResponse({ description: 'Unauthorized'})
     async getUser(@Request() req) {
         const user = await this.usersService.findOne({id: req.user.id});
@@ -22,7 +22,7 @@ export class UsersController {
 
     @HttpCode(HttpStatus.OK)
     @Put()
-    @ApiOkResponse({ description: 'Update user infomation'})
+    @ApiOkResponse({ description: 'Update user infomation successfully'})
     @ApiUnauthorizedResponse({ description: 'Unauthorized'})
     @ApiBadRequestResponse({ description: 'Bad request'})
     updateUser(@Request() req, @Body() body: UserDto) {
@@ -31,7 +31,7 @@ export class UsersController {
 
     @HttpCode(HttpStatus.OK)
     @Delete()
-    @ApiOkResponse({ description: 'Delete user'})
+    @ApiOkResponse({ description: 'Delete user successfully'})
     @ApiUnauthorizedResponse({ description: 'Unauthorized'})
     deleteUser(@Request() req) {
         return this.usersService.delete(req.user.id);
@@ -39,7 +39,7 @@ export class UsersController {
 
     @HttpCode(HttpStatus.OK)
     @Get('posts')
-    @ApiOkResponse({ description: 'Get user posts', type: [PostDto]})
+    @ApiOkResponse({ description: 'Get user posts successfully', type: [PostDto]})
     @ApiUnauthorizedResponse({ description: 'Unauthorized'})
     getUserPosts(@Request() req) {
         

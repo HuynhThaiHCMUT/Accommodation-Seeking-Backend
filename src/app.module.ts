@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { PostsModule } from './modules/posts/posts.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [TypeOrmModule.forRootAsync({
@@ -22,7 +23,7 @@ import { PostsModule } from './modules/posts/posts.module';
       autoLoadEntities: true,
     }),
     inject: [ConfigService],
-  }), ConfigModule.forRoot(), AuthModule, UsersModule, PostsModule],
+  }), ConfigModule.forRoot(), ScheduleModule.forRoot(), AuthModule, UsersModule, PostsModule],
   controllers: [AppController],
   providers: [AppService],
 })

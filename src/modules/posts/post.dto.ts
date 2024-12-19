@@ -10,7 +10,7 @@ export class PostFilterDto {
 
     @ApiPropertyOptional()
     @IsOptional()
-    utilities?: string[]
+    utilities?: string
 
     @ApiPropertyOptional()
     @IsOptional()
@@ -32,9 +32,9 @@ export class PostDto {
     @IsNotEmpty()
     name: string
 
-    @ApiProperty()
-    @IsNotEmpty()
-    description: string
+    @ApiPropertyOptional()
+    @IsOptional()
+    description?: string
 
     @ApiProperty()
     @IsNotEmpty()
@@ -54,7 +54,7 @@ export class PostDto {
 
     @ApiPropertyOptional()
     @IsOptional()
-    utilities?: string[]
+    utilities?: string
 
     @ApiProperty()
     @IsEnum(RoomType)
@@ -98,7 +98,7 @@ export class UpdatePostDto {
 
     @ApiPropertyOptional()
     @IsOptional()
-    utilities?: string[]
+    utilities?: string
 
     @ApiPropertyOptional()
     @IsOptional()

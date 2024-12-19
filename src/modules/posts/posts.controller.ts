@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Delete, Get, NotFoundException, Param, ParseIntPipe, Post, Put, Query, Req } from '@nestjs/common';
 import { ApiBearerAuth, ApiNotFoundResponse, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { PostsService } from './posts.service';
 import { PostDto, PostFilterDto, UpdatePostDto } from './post.dto';
@@ -13,8 +13,8 @@ export class PostsController {
     @ApiOkResponse({ description: 'Get post successfully', type: PostDto })
     @ApiUnauthorizedResponse({ description: 'Unauthorized'})
     @ApiNotFoundResponse({ description: 'Post not found'})
-    getPost(@Param() id: number) {
-        const post = this.postsService.findOne({id});
+    async getPost(@Param('id', ParseIntPipe) id: number) {
+        const post = await this.postsService.findOne({id});
         if (!post) throw new NotFoundException();
         return post;
     }
@@ -22,8 +22,8 @@ export class PostsController {
     @Post()
     @ApiOkResponse({ description: 'Create new post successfully', type: PostDto })
     @ApiUnauthorizedResponse({ description: 'Unauthorized'})
-    createPost(@Body() postDto: PostDto) {
-        return this.postsService.create(postDto);
+    createPost(@Body() postDto: PostDto, @Req() req) {
+        return this.postsService.create(postDto, req.user);
     }
 
     
@@ -31,7 +31,7 @@ export class PostsController {
     @ApiOkResponse({ description: 'Update post information successfully'})
     @ApiUnauthorizedResponse({ description: 'Unauthorized'})
     @ApiNotFoundResponse({ description: 'Post not found'})
-    updatePost(@Param() id: number, @Body() postDto: UpdatePostDto) {
+    updatePost(@Param('id', ParseIntPipe) id: number, @Body() postDto: UpdatePostDto) {
         return this.postsService.update(id, postDto);
     }
     
@@ -39,14 +39,18 @@ export class PostsController {
     @ApiOkResponse({ description: 'Delete post successfully'})
     @ApiUnauthorizedResponse({ description: 'Unauthorized'})
     @ApiNotFoundResponse({ description: 'Post not found'})
-    deletePost(@Param() id: number) {
+    deletePost(@Param('id', ParseIntPipe) id: number) {
         return this.postsService.delete(id);
     }
 
     @Get()
     @ApiOkResponse({ description: 'Get posts successfully', type: [PostDto] })
     @ApiUnauthorizedResponse({ description: 'Unauthorized'})
-    getPosts(@Param() offset: number, @Param() limit: number, @Param() sortBy: "time" | "price-desc" | "price-asc", @Body() filter: PostFilterDto) {
-        return this.postsService.getByOffset(offset, limit, sortBy, filter);
+    getPosts(
+        @Query('offset', new DefaultValuePipe(0), ParseIntPipe) offset?: number, 
+        @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit?: number, 
+        @Query() sortBy?: "time" | "price-desc" | "price-asc", 
+    ) {
+        return this.postsService.getByOffset(offset, limit, sortBy);
     }
 }

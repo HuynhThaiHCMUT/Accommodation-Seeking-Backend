@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { And, FindOptionsWhere, LessThanOrEqual, Like, MoreThanOrEqual, Or, Repository } from 'typeorm';
 import { PostDto, PostFilterDto, UpdatePostDto } from './post.dto';
@@ -6,38 +6,54 @@ import { Post } from './post.entity';
 
 @Injectable()
 export class PostsService {
+    private readonly logger = new Logger(PostsService.name);
+
     constructor(
         @InjectRepository(Post)
         private postsRepository: Repository<Post>,
     ) {}
 
     async findOne(findOptions: FindOptionsWhere<Post>) {
-        return this.postsRepository.findOneBy(findOptions);
+        return await this.postsRepository.findOneBy(findOptions);
     }
 
-    async create(post: PostDto) {
-        const convertedPost = {...post, utilities: post.utilities.join(',')};
+    async create(post: PostDto, user: any) {
+        // DEVELOPMENT: If user is not provided, use the first user
+        if (!user) {
+            user = { id: 1 };
+        }
+        const convertedPost = {
+            ...post,
+            postedAt: new Date(),
+            postedBy: user,
+        };
         const newPost = this.postsRepository.create(convertedPost);
         await this.postsRepository.save(newPost);
         return newPost;
     }
 
     async update(id: number, post: UpdatePostDto) {
-        const convertedPost = {...post, utilities: post.utilities.join(',')};
-        let updateResult = await this.postsRepository.update(id, convertedPost);
+
+        let updateResult = await this.postsRepository.update(id, post);
         if (updateResult.affected == 0) throw new NotFoundException();
         return;
     }
 
     async delete(id: number) {
-        let deleteResult = await this.postsRepository.delete(id);
+        let deleteResult = await this.postsRepository.update(id, { deleted: true });
         if (deleteResult.affected == 0) throw new NotFoundException();
         return;
     }
 
-    async getByOffset(offset: number, limit: number, sortBy: 'time' | 'price-desc' | 'price-asc', filter: PostFilterDto) {
+    async getByOffset(
+        offset: number = 0, 
+        limit: number = 10, 
+        sortBy?: 'time' | 'price-desc' | 'price-asc', 
+        filter?: PostFilterDto
+    ) {
+        this.logger.log(JSON.stringify(offset));
         let order: { [key: string]: 'ASC' | 'DESC' } = {};
-        if (sortBy == 'time') {
+        if (sortBy == 'time' || !sortBy) {
             order.postedAt = 'DESC';
         } else if (sortBy == 'price-desc') {
             order.price = 'DESC';
@@ -45,26 +61,27 @@ export class PostsService {
             order.price = 'ASC';
         }
         let where: FindOptionsWhere<Post> = {};
-        if (filter.roomType) {
+        if (filter?.roomType) {
             where.roomType = filter.roomType;
         }
-        if (filter.utilities.length > 0) {
-            where.utilities = Like(`%${filter.utilities[0]}%`);
-            for (let utility of filter.utilities) {
+        if ((typeof filter?.utilities === 'string') && filter.utilities.length > 0) {
+            let utilities = filter.utilities.split(',');
+            where.utilities = Like(`%${utilities[0]}%`);
+            for (let utility of utilities) {
                 where.utilities = Or(where.utilities, Like(`%${utility}%`));
             }
         }
-        if (filter.address) {
-            where.address = filter.address;
+        if (filter?.address) {
+            where.address = Like(`%${filter.address}%`);
         }
-        if (filter.priceFrom && filter.priceTo) {
+        if (filter?.priceFrom && filter.priceTo) {
             where.price = And(MoreThanOrEqual(filter.priceFrom), LessThanOrEqual(filter.priceTo));
-        } else if (filter.priceFrom) {
+        } else if (filter?.priceFrom) {
             where.price = MoreThanOrEqual(filter.priceFrom);
-        } else if (filter.priceTo) {
+        } else if (filter?.priceTo) {
             where.price = LessThanOrEqual(filter.priceTo);
         }
-        return this.postsRepository.find({
+        return await this.postsRepository.find({
             skip: offset,
             take: limit,
             order,

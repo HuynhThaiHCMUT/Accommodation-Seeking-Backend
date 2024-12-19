@@ -20,7 +20,7 @@ export class Post {
     id: number
     @Column()
     name: string
-    @Column()
+    @Column({default: false})
     deleted: boolean
     @Column()
     description: string

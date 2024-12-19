@@ -1,7 +1,8 @@
 import { Body, Controller, DefaultValuePipe, Delete, Get, NotFoundException, Param, ParseIntPipe, Post, Put, Query, Req } from '@nestjs/common';
-import { ApiBearerAuth, ApiNotFoundResponse, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiNotFoundResponse, ApiOkResponse, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { PostDto, UpdatePostDto } from './post.dto';
 import { PostsService } from './posts.service';
+import { RoomType } from './post.entity';
 
 @ApiTags('posts')
 @ApiBearerAuth()
@@ -44,6 +45,14 @@ export class PostsController {
     }
 
     @Get()
+    @ApiQuery({ name: 'offset', required: false, type: Number })
+    @ApiQuery({ name: 'limit', required: false, type: Number })
+    @ApiQuery({ name: 'sortBy', required: false, type: String, enum: ['time', 'price-desc', 'price-asc'] })
+    @ApiQuery({ name: 'roomType', required: false, type: String, enum: RoomType })
+    @ApiQuery({ name: 'utilities', required: false, type: String })
+    @ApiQuery({ name: 'address', required: false, type: String })
+    @ApiQuery({ name: 'priceFrom', required: false, type: Number })
+    @ApiQuery({ name: 'priceTo', required: false, type: Number })
     @ApiOkResponse({ description: 'Get posts successfully', type: [PostDto] })
     @ApiUnauthorizedResponse({ description: 'Unauthorized'})
     getPosts(

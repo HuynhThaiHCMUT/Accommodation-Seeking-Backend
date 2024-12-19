@@ -32,6 +32,8 @@ export class Post {
     area: string
     @Column("int")
     capacity: number
+    @Column()
+    utilities: string
     @Column({
         type: "enum",
         enum: RoomType,

@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put } from '@nestjs/common';
 import { ApiBearerAuth, ApiNotFoundResponse, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { PostsService } from './posts.service';
-import { PostDto, UpdatePostDto } from './post.dto';
+import { PostDto, PostFilterDto, UpdatePostDto } from './post.dto';
 
 @ApiTags('posts')
 @ApiBearerAuth()
@@ -46,7 +46,7 @@ export class PostsController {
     @Get()
     @ApiOkResponse({ description: 'Get posts successfully', type: [PostDto] })
     @ApiUnauthorizedResponse({ description: 'Unauthorized'})
-    getPosts(@Param() offset: number, @Param() limit: number) {
-        return this.postsService.getByOffset(offset, limit);
+    getPosts(@Param() offset: number, @Param() limit: number, @Param() sortBy: "time" | "price-desc" | "price-asc", @Body() filter: PostFilterDto) {
+        return this.postsService.getByOffset(offset, limit, sortBy, filter);
     }
 }

@@ -1,5 +1,31 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger"
-import { IsNotEmpty, IsOptional } from "class-validator"
+import { IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional } from "class-validator"
+import { PostType, RoomType } from "./post.entity"
+
+export class PostFilterDto {
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsEnum(RoomType)
+    roomType?: RoomType
+
+    @ApiPropertyOptional()
+    @IsOptional()
+    utilities?: string[]
+
+    @ApiPropertyOptional()
+    @IsOptional()
+    address?: string
+
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsInt()
+    priceFrom?: number
+
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsInt()
+    priceTo?: number
+}
 
 export class PostDto {
     @ApiProperty()
@@ -15,7 +41,7 @@ export class PostDto {
     address: string
 
     @ApiProperty()
-    @IsNotEmpty()
+    @IsInt()
     price: number
     
     @ApiProperty()
@@ -23,15 +49,19 @@ export class PostDto {
     area: string
 
     @ApiProperty()
-    @IsNotEmpty()
+    @IsInt()
     capacity: number
 
+    @ApiPropertyOptional()
+    @IsOptional()
+    utilities?: string[]
+
     @ApiProperty()
-    @IsNotEmpty()
+    @IsEnum(RoomType)
     roomType: string
 
     @ApiProperty()
-    @IsNotEmpty()
+    @IsEnum(PostType)
     postType: string
 }
 
@@ -53,7 +83,7 @@ export class UpdatePostDto {
 
     @ApiPropertyOptional()
     @IsOptional()
-    @IsNotEmpty()
+    @IsInt()
     price?: number
     
     @ApiPropertyOptional()
@@ -63,16 +93,20 @@ export class UpdatePostDto {
 
     @ApiPropertyOptional()
     @IsOptional()
-    @IsNotEmpty()
+    @IsInt()
     capacity?: number
 
     @ApiPropertyOptional()
     @IsOptional()
-    @IsNotEmpty()
+    utilities?: string[]
+
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsEnum(RoomType)
     roomType?: string
 
     @ApiPropertyOptional()
     @IsOptional()
-    @IsNotEmpty()
+    @IsEnum(PostType)
     postType?: string
 }

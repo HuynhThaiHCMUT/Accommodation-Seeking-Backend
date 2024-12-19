@@ -14,7 +14,7 @@ export class UsersController {
     @Get(':id')
     @ApiOkResponse({ description: 'Get user info successfully', type: UserDto })
     @ApiUnauthorizedResponse({ description: 'Unauthorized'})
-    async getUser(@Param('id', ParseIntPipe) id) {
+    async getUser(@Param('id', ParseIntPipe) id: number) {
         const user = await this.usersService.findOne({id});
         if (!user) throw new NotFoundException();
         return {...user, password: undefined, id: undefined};
@@ -25,7 +25,7 @@ export class UsersController {
     @ApiOkResponse({ description: 'Update user infomation successfully'})
     @ApiUnauthorizedResponse({ description: 'Unauthorized'})
     @ApiBadRequestResponse({ description: 'Bad request'})
-    updateUser(@Param('id', ParseIntPipe) id, @Request() req, @Body() body: UserDto) {
+    updateUser(@Param('id', ParseIntPipe) id: number, @Request() req, @Body() body: UserDto) {
         if (req.user?.id !== id) throw new UnauthorizedException();
         return this.usersService.update(req.user.id, body);
     }
@@ -34,7 +34,7 @@ export class UsersController {
     @Delete(':id')
     @ApiOkResponse({ description: 'Delete user successfully'})
     @ApiUnauthorizedResponse({ description: 'Unauthorized'})
-    deleteUser(@Param('id', ParseIntPipe) id, @Request() req) {
+    deleteUser(@Param('id', ParseIntPipe) id: number, @Request() req) {
         if (req.user?.id !== id) throw new UnauthorizedException();
         return this.usersService.delete(req.user.id);
     }
@@ -43,7 +43,7 @@ export class UsersController {
     @Get(':id/posts')
     @ApiOkResponse({ description: 'Get user posts successfully', type: [PostDto]})
     @ApiUnauthorizedResponse({ description: 'Unauthorized'})
-    getUserPosts(@Param('id', ParseIntPipe) id) {
+    getUserPosts(@Param('id', ParseIntPipe) id: number) {
         return this.usersService.getPostsByUser(id);
     }
 }

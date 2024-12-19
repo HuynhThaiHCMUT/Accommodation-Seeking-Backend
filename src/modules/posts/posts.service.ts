@@ -1,7 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { And, FindOptionsWhere, LessThanOrEqual, Like, MoreThanOrEqual, Or, Repository } from 'typeorm';
-import { PostDto, PostFilterDto, UpdatePostDto } from './post.dto';
+import { PostDto, UpdatePostDto } from './post.dto';
 import { Post } from './post.entity';
 
 @Injectable()
@@ -45,41 +45,48 @@ export class PostsService {
         return;
     }
 
-    async getByOffset(
+    async get(
         offset: number = 0, 
         limit: number = 10, 
         sortBy?: 'time' | 'price-desc' | 'price-asc', 
-        filter?: PostFilterDto
+        roomType?: string,
+        utilities?: string,
+        address?: string,
+        priceFrom?: number,
+        priceTo?: number
     ) {
-        this.logger.log(JSON.stringify(offset));
         let order: { [key: string]: 'ASC' | 'DESC' } = {};
-        if (sortBy == 'time' || !sortBy) {
-            order.postedAt = 'DESC';
-        } else if (sortBy == 'price-desc') {
-            order.price = 'DESC';
-        } else if (sortBy == 'price-asc') {
-            order.price = 'ASC';
+        switch (sortBy) {
+            case 'price-asc':
+                order.price = 'ASC';
+                break;
+            case 'price-desc':
+                order.price = 'DESC';
+                break;
+            default:
+                order.postedAt = 'DESC';
+                break;
         }
         let where: FindOptionsWhere<Post> = {};
-        if (filter?.roomType) {
-            where.roomType = filter.roomType;
+        if (roomType) {
+            where.roomType = roomType;
         }
-        if ((typeof filter?.utilities === 'string') && filter.utilities.length > 0) {
-            let utilities = filter.utilities.split(',');
-            where.utilities = Like(`%${utilities[0]}%`);
-            for (let utility of utilities) {
+        if ((typeof utilities === 'string') && utilities.length > 0) {
+            let utilitiesArray = utilities.split(',');
+            where.utilities = Like(`%${utilitiesArray[0]}%`);
+            for (let utility of utilitiesArray) {
                 where.utilities = Or(where.utilities, Like(`%${utility}%`));
             }
         }
-        if (filter?.address) {
-            where.address = Like(`%${filter.address}%`);
+        if (address) {
+            where.address = Like(`%${address}%`);
         }
-        if (filter?.priceFrom && filter.priceTo) {
-            where.price = And(MoreThanOrEqual(filter.priceFrom), LessThanOrEqual(filter.priceTo));
-        } else if (filter?.priceFrom) {
-            where.price = MoreThanOrEqual(filter.priceFrom);
-        } else if (filter?.priceTo) {
-            where.price = LessThanOrEqual(filter.priceTo);
+        if (priceFrom && priceTo) {
+            where.price = And(MoreThanOrEqual(priceFrom), LessThanOrEqual(priceTo));
+        } else if (priceFrom) {
+            where.price = MoreThanOrEqual(priceFrom);
+        } else if (priceTo) {
+            where.price = LessThanOrEqual(priceTo);
         }
         return await this.postsRepository.find({
             skip: offset,

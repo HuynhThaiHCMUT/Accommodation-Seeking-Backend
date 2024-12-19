@@ -1,7 +1,7 @@
 import { Body, Controller, DefaultValuePipe, Delete, Get, NotFoundException, Param, ParseIntPipe, Post, Put, Query, Req } from '@nestjs/common';
 import { ApiBearerAuth, ApiNotFoundResponse, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { PostDto, UpdatePostDto } from './post.dto';
 import { PostsService } from './posts.service';
-import { PostDto, PostFilterDto, UpdatePostDto } from './post.dto';
 
 @ApiTags('posts')
 @ApiBearerAuth()
@@ -49,8 +49,22 @@ export class PostsController {
     getPosts(
         @Query('offset', new DefaultValuePipe(0), ParseIntPipe) offset?: number, 
         @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit?: number, 
-        @Query() sortBy?: "time" | "price-desc" | "price-asc", 
+        @Query('sortBy') sortBy?: "time" | "price-desc" | "price-asc", 
+        @Query('roomType') roomType?: string,
+        @Query('utilities') utilities?: string,
+        @Query('address') address?: string,
+        @Query('priceFrom', new ParseIntPipe({optional: true})) priceFrom?: number,
+        @Query('priceTo', new ParseIntPipe({optional: true})) priceTo?: number
     ) {
-        return this.postsService.getByOffset(offset, limit, sortBy);
+        return this.postsService.get(
+            offset, 
+            limit, 
+            sortBy,
+            roomType,
+            utilities,
+            address,
+            priceFrom,
+            priceTo
+        );
     }
 }

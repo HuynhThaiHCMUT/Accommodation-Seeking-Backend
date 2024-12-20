@@ -46,9 +46,9 @@ export class UsersController {
         return this.usersService.getPostsByUser(id);
     }
 
-    @Post(':id/avatar')
-    @ApiBody({ description: 'Upload avatar', type: FileUploadDto})
-    @ApiOkResponse({ description: 'Upload avatar successfully', type: String})
+    @Post(':id/picture')
+    @ApiBody({ description: 'Upload picture', type: FileUploadDto})
+    @ApiOkResponse({ description: 'Upload picture successfully', type: String})
     @ApiUnauthorizedResponse({ description: 'Unauthorized'})
     @UseInterceptors(
         FileInterceptor('file', {

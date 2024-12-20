@@ -1,6 +1,13 @@
-import { ApiPropertyOptional } from "@nestjs/swagger"
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger"
 import { IsDateString, IsEmail, IsEnum, IsMobilePhone, IsNotEmpty, IsOptional } from "class-validator"
 import { Gender } from "./user.entity"
+
+
+export class FileUploadDto {
+    @ApiProperty({ type: 'string', format: 'binary' })
+    file: any;
+}
+  
 
 export class UserDto {
     @ApiPropertyOptional()

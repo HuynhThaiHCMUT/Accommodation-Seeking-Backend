@@ -1,6 +1,13 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger"
 import { IsEnum, IsInt, IsNotEmpty, IsOptional } from "class-validator"
 import { PostType, RoomType } from "./post.entity"
+import { Gender } from "../users/user.entity"
+
+export class FilesUploadDto {
+    @ApiProperty({ type: 'array', items: { type: 'string', format: 'binary' } })
+    files: any[];
+  }
+  
 
 export class PostDto {
     @ApiProperty()
@@ -15,21 +22,38 @@ export class PostDto {
     @IsNotEmpty()
     address: string
 
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsEnum(Gender)
+    gender?: string
+
     @ApiProperty()
     @IsInt()
     price: number
-    
-    @ApiProperty()
-    @IsNotEmpty()
-    area: string
 
     @ApiProperty()
     @IsInt()
-    capacity: number
+    deposit: number
 
+    @ApiProperty()
+    @IsInt()
+    floor: number
+    
+    @ApiProperty()
+    @IsInt()
+    capacity: number
+    
+    @ApiProperty()
+    @IsNotEmpty()
+    area: number
+    
     @ApiPropertyOptional()
     @IsOptional()
     utilities?: string
+
+    @ApiPropertyOptional()
+    @IsOptional()
+    interior: string
 
     @ApiProperty()
     @IsEnum(RoomType)
@@ -58,22 +82,41 @@ export class UpdatePostDto {
 
     @ApiPropertyOptional()
     @IsOptional()
-    @IsInt()
-    price?: number
-    
+    @IsEnum(Gender)
+    gender?: string
+
     @ApiPropertyOptional()
     @IsOptional()
-    @IsNotEmpty()
-    area?: string
+    @IsInt()
+    price?: number
 
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsInt()
+    deposit?: number
+
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsInt()
+    floor?: number
+    
     @ApiPropertyOptional()
     @IsOptional()
     @IsInt()
     capacity?: number
-
+    
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsNotEmpty()
+    area?: number
+    
     @ApiPropertyOptional()
     @IsOptional()
     utilities?: string
+
+    @ApiPropertyOptional()
+    @IsOptional()
+    interior: string
 
     @ApiPropertyOptional()
     @IsOptional()

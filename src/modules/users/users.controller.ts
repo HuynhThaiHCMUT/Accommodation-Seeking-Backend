@@ -1,6 +1,8 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, NotFoundException, Param, ParseIntPipe, Put, Request, UnauthorizedException } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
-import { UserDto } from './user.dto';
+import { diskStorage } from 'multer';
+import { Body, Controller, Delete, Get, NotFoundException, Param, ParseIntPipe, Post, Put, Request, UnauthorizedException, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { FileUploadDto, UserDto } from './user.dto';
 import { UsersService } from './users.service';
 import { PostDto } from '../posts/post.dto';
 
@@ -10,7 +12,6 @@ import { PostDto } from '../posts/post.dto';
 export class UsersController {
     constructor( private readonly usersService: UsersService) {}
     
-    @HttpCode(HttpStatus.OK)
     @Get(':id')
     @ApiOkResponse({ description: 'Get user info successfully', type: UserDto })
     @ApiUnauthorizedResponse({ description: 'Unauthorized'})
@@ -20,7 +21,7 @@ export class UsersController {
         return {...user, password: undefined, id: undefined};
     }
 
-    @HttpCode(HttpStatus.OK)
+
     @Put(':id')
     @ApiOkResponse({ description: 'Update user infomation successfully'})
     @ApiUnauthorizedResponse({ description: 'Unauthorized'})
@@ -30,7 +31,6 @@ export class UsersController {
         return this.usersService.update(req.user.id, body);
     }
 
-    @HttpCode(HttpStatus.OK)
     @Delete(':id')
     @ApiOkResponse({ description: 'Delete user successfully'})
     @ApiUnauthorizedResponse({ description: 'Unauthorized'})
@@ -39,11 +39,33 @@ export class UsersController {
         return this.usersService.delete(req.user.id);
     }
 
-    @HttpCode(HttpStatus.OK)
     @Get(':id/posts')
     @ApiOkResponse({ description: 'Get user posts successfully', type: [PostDto]})
     @ApiUnauthorizedResponse({ description: 'Unauthorized'})
     getUserPosts(@Param('id', ParseIntPipe) id: number) {
         return this.usersService.getPostsByUser(id);
+    }
+
+    @Post(':id/avatar')
+    @ApiBody({ description: 'Upload avatar', type: FileUploadDto})
+    @ApiOkResponse({ description: 'Upload avatar successfully', type: String})
+    @ApiUnauthorizedResponse({ description: 'Unauthorized'})
+    @UseInterceptors(
+        FileInterceptor('file', {
+            storage: diskStorage({
+                destination: './pictures',
+                filename: (req, file, callback) => {
+                    const id = req.params.id;
+                    const filename = `${id}${file.originalname.substring(file.originalname.lastIndexOf('.'))}`;
+                    callback(null, filename);
+                },
+            }),
+        }),
+    )
+    uploadAvatar(@Param('id', ParseIntPipe) id: number, @UploadedFile() file: Express.Multer.File) {
+        if (!file) {
+            throw new NotFoundException('File not found');
+        }
+        return this.usersService.uploadAvatar(id, file.filename);
     }
 }

@@ -29,6 +29,8 @@ export class User {
     picture: string
     @Column()
     password: string
+    @Column({type: "integer", default: 0})
+    postCount: number
     @OneToMany(() => Post, post => post.postedBy)
     posts: Post[]
 }

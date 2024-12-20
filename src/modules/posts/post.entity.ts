@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
-import { User } from "../users/user.entity"
+import { Gender, User } from "../users/user.entity"
 
 export enum RoomType {
     ROOM = "Phòng trọ",
@@ -26,14 +26,25 @@ export class Post {
     description: string
     @Column()
     address: string
+    @Column({
+        enum: Gender, 
+        nullable: true,
+    })
+    gender: string
     @Column("int")
     price: number
-    @Column()
-    area: string
+    @Column("int")
+    deposit: number
+    @Column("int")
+    floor: number
     @Column("int")
     capacity: number
     @Column()
+    area: number
+    @Column()
     utilities: string
+    @Column()
+    interior: string
     @Column({
         type: "enum",
         enum: RoomType,
@@ -48,4 +59,6 @@ export class Post {
     postedAt: Date
     @ManyToOne(() => User, user => user.id)
     postedBy: User
+
+    pictures?: string[];
 }

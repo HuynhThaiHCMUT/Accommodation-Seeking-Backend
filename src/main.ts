@@ -14,7 +14,9 @@ async function bootstrap() {
     .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, 'bearer')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('', app, documentFactory);
+  SwaggerModule.setup('', app, documentFactory, {
+    jsonDocumentUrl: 'json',
+  });
   
   app.useGlobalPipes(new ValidationPipe());
 

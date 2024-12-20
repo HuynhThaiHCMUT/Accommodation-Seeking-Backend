@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Body, Controller, DefaultValuePipe, Delete, Get, NotFoundException, Param, ParseIntPipe, Post, Put, Query, Req, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiNotFoundResponse, ApiOkResponse, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
-import { FilesUploadDto, PostDto, UpdatePostDto } from './post.dto';
+import { FilesUploadDto, NoUserPostDto, PostDto, ResPostDto, UpdatePostDto } from './post.dto';
 import { PostsService } from './posts.service';
 import { PostType, RoomType } from './post.entity';
 import { Gender } from '../users/user.entity';
@@ -15,7 +15,7 @@ export class PostsController {
     constructor(private readonly postsService: PostsService) {}
 
     @Get(':id')
-    @ApiOkResponse({ description: 'Get post successfully', type: PostDto })
+    @ApiOkResponse({ description: 'Get post successfully', type: ResPostDto })
     @ApiUnauthorizedResponse({ description: 'Unauthorized'})
     @ApiNotFoundResponse({ description: 'Post not found'})
     async getPost(@Param('id', ParseIntPipe) id: number) {
@@ -25,7 +25,7 @@ export class PostsController {
     }
 
     @Post()
-    @ApiOkResponse({ description: 'Create new post successfully', type: PostDto })
+    @ApiOkResponse({ description: 'Create new post successfully', type: ResPostDto })
     @ApiUnauthorizedResponse({ description: 'Unauthorized'})
     createPost(@Body() postDto: PostDto, @Req() req) {
         return this.postsService.create(postDto, req.user);
@@ -60,7 +60,7 @@ export class PostsController {
     @ApiQuery({ name: 'address', required: false, type: String })
     @ApiQuery({ name: 'priceFrom', required: false, type: Number })
     @ApiQuery({ name: 'priceTo', required: false, type: Number })
-    @ApiOkResponse({ description: 'Get posts successfully', type: [PostDto] })
+    @ApiOkResponse({ description: 'Get posts successfully', type: [NoUserPostDto] })
     @ApiUnauthorizedResponse({ description: 'Unauthorized'})
     getPosts(
         @Query('postType') postType: string,

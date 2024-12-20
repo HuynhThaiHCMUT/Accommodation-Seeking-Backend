@@ -4,7 +4,6 @@ import { User } from './user.entity';
 import { FindOptionsWhere, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserDto } from './user.dto';
-import { Post } from '../posts/post.entity';
 
 
 @Injectable()
@@ -12,12 +11,10 @@ export class UsersService {
     constructor(
         @InjectRepository(User)
         private usersRepository: Repository<User>,
-        @InjectRepository(Post)
-        private postsRepository: Repository<Post>,
     ) {}
 
     async findOne(findOptions: FindOptionsWhere<User>): Promise<User> {
-        return await this.usersRepository.findOneBy([findOptions, {deleted: false}]);
+        return await this.usersRepository.findOneBy({...findOptions, deleted: false});
     }
 
     async create(userDto: SignUpDto): Promise<User> {
@@ -42,13 +39,5 @@ export class UsersService {
         let deleteResult = await this.usersRepository.update(id, {deleted: true});
         if (deleteResult.affected == 0) throw new UnauthorizedException();
         return;
-    }
-
-    async getPostsByUser(userId: number) {
-        return await this.postsRepository.find({
-            where: {
-                postedBy: { id: userId }
-            }
-        });
     }
 }

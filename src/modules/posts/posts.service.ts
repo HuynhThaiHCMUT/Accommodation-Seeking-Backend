@@ -21,7 +21,7 @@ export class PostsService {
 
     async findOne(findOptions: FindOptionsWhere<Post>): Promise<Post> {
         let post = await this.postsRepository.findOne({
-            where: [findOptions, {deleted: false}],
+            where: {...findOptions, deleted: false},
             relations: ['postedBy']
         });
         if (post) {
@@ -99,24 +99,15 @@ export class PostsService {
         }
         if ((typeof roomType === 'string') && roomType.length > 0) {
             let roomTypeArray = roomType.split(',');
-            where.roomType = Like(`%${roomTypeArray[0]}%`);
-            for (let i = 1; i < roomTypeArray.length; i++) {
-                where.roomType = Or(where.roomType, Like(`%${roomTypeArray[i]}%`));
-            }
+            where.roomType = Or(...roomTypeArray.map((value) => Like(`%${value}%`)))
         }
         if ((typeof utilities === 'string') && utilities.length > 0) {
             let utilitiesArray = utilities.split(',');
-            where.utilities = Like(`%${utilitiesArray[0]}%`);
-            for (let i = 1; i < utilitiesArray.length; i++) {
-                where.utilities = Or(where.utilities, Like(`%${utilitiesArray[i]}%`));
-            }
+            where.utilities = And(...utilitiesArray.map((value) => Like(`%${value}%`)))
         }
         if ((typeof interior === 'string') && interior.length > 0) {
             let interiorArray = interior.split(',');
-            where.interior = Like(`%${interiorArray[0]}%`);
-            for (let i = 1; i < interiorArray.length; i++) {
-                where.interior = Or(where.interior, Like(`%${interiorArray[i]}%`));
-            }
+            where.interior = And(...interiorArray.map((value) => Like(`%${value}%`)))
         }
         if (priceFrom && priceTo) {
             where.price = And(MoreThanOrEqual(priceFrom), LessThanOrEqual(priceTo));
@@ -129,7 +120,28 @@ export class PostsService {
             skip: offset,
             take: limit,
             order,
-            where
+            where,
+        });
+        for (let post of posts) {
+            post.pictures = await this.getPicturesById(post.id);
+        }
+        return posts;
+    }
+
+    async getPostsByUser(
+        userId: number,
+        postType: string,
+        offset: number = 0, 
+        limit: number = 10, 
+    ) {
+        let posts = await this.postsRepository.find({
+            where: {
+                postedBy: { id: userId },
+                postType,
+                deleted: false,
+            },
+            skip: offset,
+            take: limit,
         });
         for (let post of posts) {
             post.pictures = await this.getPicturesById(post.id);

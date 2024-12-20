@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger"
 import { IsEnum, IsInt, IsNotEmpty, IsOptional } from "class-validator"
 import { PostType, RoomType } from "./post.entity"
 import { Gender } from "../users/user.entity"
+import { UserDto } from "../users/user.dto";
 
 export class FilesUploadDto {
     @ApiProperty({ type: 'array', items: { type: 'string', format: 'binary' } })
@@ -127,4 +128,17 @@ export class UpdatePostDto {
     @IsOptional()
     @IsEnum(PostType)
     postType?: string
+}
+
+export class NoUserPostDto extends PostDto {
+    @ApiProperty()
+    postedAt: Date
+
+    @ApiProperty()
+    pictures: string[]
+}
+
+export class ResPostDto extends NoUserPostDto {
+    @ApiProperty()
+    postedBy: UserDto
 }

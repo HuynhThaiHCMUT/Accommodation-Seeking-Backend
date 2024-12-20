@@ -1,16 +1,21 @@
 import { diskStorage } from 'multer';
-import { Body, Controller, Delete, Get, NotFoundException, Param, ParseIntPipe, Post, Put, Request, UnauthorizedException, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Delete, Get, NotFoundException, Param, ParseIntPipe, Post, Put, Query, Request, UnauthorizedException, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiOkResponse, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { FileUploadDto, UserDto } from './user.dto';
 import { UsersService } from './users.service';
-import { PostDto } from '../posts/post.dto';
+import { NoUserPostDto } from '../posts/post.dto';
+import { PostType } from '../posts/post.entity';
+import { PostsService } from '../posts/posts.service';
 
 @ApiTags('users')
 @ApiBearerAuth()
 @Controller('users')
 export class UsersController {
-    constructor( private readonly usersService: UsersService) {}
+    constructor( 
+        private readonly usersService: UsersService,
+        private readonly postsService: PostsService,
+    ) {}
     
     @Get(':id')
     @ApiOkResponse({ description: 'Get user info successfully', type: UserDto })
@@ -40,10 +45,18 @@ export class UsersController {
     }
 
     @Get(':id/posts')
-    @ApiOkResponse({ description: 'Get user posts successfully', type: [PostDto]})
+    @ApiQuery({ name: 'postType', required: true, type: String, enum: PostType })
+    @ApiQuery({ name: 'offset', required: false, type: Number })
+    @ApiQuery({ name: 'limit', required: false, type: Number })
+    @ApiOkResponse({ description: 'Get user posts successfully', type: [NoUserPostDto]})
     @ApiUnauthorizedResponse({ description: 'Unauthorized'})
-    getUserPosts(@Param('id', ParseIntPipe) id: number) {
-        return this.usersService.getPostsByUser(id);
+    getUserPosts(
+        @Param('id', ParseIntPipe) id: number,
+        @Query('postType') postType: string,
+        @Query('offset', new DefaultValuePipe(0), ParseIntPipe) offset?: number, 
+        @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit?: number, 
+    ) {
+        return this.postsService.getPostsByUser(id, postType, offset, limit);
     }
 
     @Post(':id/picture')

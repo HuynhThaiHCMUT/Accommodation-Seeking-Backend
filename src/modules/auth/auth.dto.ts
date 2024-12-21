@@ -23,11 +23,7 @@ export class SignUpDto {
 
     @ApiProperty()
     @IsNotEmpty()
-    firstName: string;
-
-    @ApiProperty()
-    @IsNotEmpty()
-    lastName: string;
+    name: string;
 
     @ApiProperty()
     @IsMobilePhone()

@@ -13,12 +13,7 @@ export class UserDto {
     @ApiPropertyOptional()
     @IsOptional()
     @IsNotEmpty()
-    firstName?: string
-
-    @ApiPropertyOptional()
-    @IsOptional()
-    @IsNotEmpty()
-    lastName?: string
+    name?: string
 
     @ApiPropertyOptional()
     @IsOptional()

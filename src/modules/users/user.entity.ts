@@ -11,10 +11,8 @@ export enum Gender {
 export class User {
     @PrimaryGeneratedColumn()
     id: number
-    @Column({length: 40})
-    firstName: string
-    @Column({length: 40})
-    lastName: string
+    @Column()
+    name: string
     @Column({default: false})
     deleted: boolean
     @Column({unique: true})

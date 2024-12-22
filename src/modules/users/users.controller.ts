@@ -1,7 +1,7 @@
 import { diskStorage } from 'multer';
-import { Body, Controller, DefaultValuePipe, Delete, Get, NotFoundException, Param, ParseIntPipe, Post, Put, Query, Request, UnauthorizedException, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Delete, Get, NotFoundException, Param, ParseIntPipe, Post, Put, Query, Req, Request, UnauthorizedException, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiOkResponse, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiOkResponse, ApiParam, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { FileUploadDto, UserDto } from './user.dto';
 import { UsersService } from './users.service';
 import { NoUserPostDto } from '../posts/post.dto';
@@ -16,14 +16,22 @@ export class UsersController {
         private readonly usersService: UsersService,
         private readonly postsService: PostsService,
     ) {}
-    
-    @Get(':id')
+
+    @Get(':id?') // Make the id parameter optional
+    @ApiParam({ name: 'id', required: false, type: Number })
     @ApiOkResponse({ description: 'Get user info successfully', type: UserDto })
-    @ApiUnauthorizedResponse({ description: 'Unauthorized'})
-    async getUser(@Param('id', ParseIntPipe) id: number) {
-        const user = await this.usersService.findOne({id});
+    @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+    async getUser(
+        @Req() req,
+        @Param('id', new ParseIntPipe({optional: true})) id?: number, // Optional id parameter
+    ) {
+        const userId = id ?? req.user.id; // Use id if provided; otherwise, use the id from the JWT
+        const user = await this.usersService.findOne({ id: userId });
+
         if (!user) throw new NotFoundException();
-        return {...user, password: undefined, id: undefined};
+
+        // Remove sensitive fields before returning the user
+        return { ...user, password: undefined, id: undefined };
     }
 
 

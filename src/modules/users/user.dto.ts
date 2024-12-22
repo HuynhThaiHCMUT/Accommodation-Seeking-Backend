@@ -38,3 +38,8 @@ export class UserDto {
     @ApiPropertyOptional()
     picture?: string
 }
+
+export class ResUserDto extends UserDto {
+    @ApiProperty()
+    id: number
+}

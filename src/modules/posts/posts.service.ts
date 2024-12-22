@@ -26,6 +26,7 @@ export class PostsService {
         });
         if (post) {
             post.pictures = await this.getPicturesById(post.id);
+            post.postedBy.password = undefined;
         }
         return post;
     }

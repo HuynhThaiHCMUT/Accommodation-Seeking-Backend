@@ -132,6 +132,9 @@ export class UpdatePostDto {
 
 export class NoUserPostDto extends PostDto {
     @ApiProperty()
+    id: number
+
+    @ApiProperty()
     postedAt: Date
 
     @ApiProperty()
@@ -140,5 +143,5 @@ export class NoUserPostDto extends PostDto {
 
 export class ResPostDto extends NoUserPostDto {
     @ApiProperty()
-    postedBy: UserDto
+    postedBy: ResPostDto
 }

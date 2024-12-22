@@ -4,8 +4,8 @@ import { Gender } from "../users/user.entity";
 
 export class SignInDto {
     @ApiProperty()
-    @IsMobilePhone()
-    phone: string;
+    @IsEmail()
+    email: string;
 
     @ApiProperty({ minLength: 8 })
     @MinLength(8)

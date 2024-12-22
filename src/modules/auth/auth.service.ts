@@ -13,13 +13,13 @@ export class AuthService {
     ) {}
 
     async signIn(signInDto: SignInDto): Promise<TokenDto> {
-        const user = await this.usersService.findOne({phone: signInDto.phone});
+        const user = await this.usersService.findOne({email: signInDto.email});
         if (!user) {
-            throw new UnauthorizedException('Incorrect phone number or password');
+            throw new UnauthorizedException('Incorrect email or password');
         }
         const isMatch = await bcrypt.compare(signInDto.password, user?.password);
         if (!isMatch) {
-            throw new UnauthorizedException('Incorrect phone number or password');
+            throw new UnauthorizedException('Incorrect email or password');
         }
         const { password, ...result } = user;
         return {

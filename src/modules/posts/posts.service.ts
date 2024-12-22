@@ -143,6 +143,7 @@ export class PostsService {
             },
             skip: offset,
             take: limit,
+            order: { postedAt: 'DESC' },
         });
         for (let post of posts) {
             post.pictures = await this.getPicturesById(post.id);

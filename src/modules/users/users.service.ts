@@ -19,8 +19,7 @@ export class UsersService {
 
     async create(userDto: SignUpDto): Promise<User> {
         const user = this.usersRepository.create(userDto);
-        await this.usersRepository.save(user);
-        return user;
+        return await this.usersRepository.save(user);
     }
 
     async uploadAvatar(id: number, picture: string): Promise<string> {

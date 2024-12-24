@@ -27,7 +27,7 @@ export class UsersController {
         @Req() req,
         @Param('id', new ParseIntPipe({optional: true})) id?: number, // Optional id parameter
     ) {
-        const userId = id ?? req.user.id; // Use id if provided; otherwise, use the id from the JWT
+        const userId = id ?? req?.user?.id; // Use id if provided; otherwise, use the id from the JWT
         const user = await this.usersService.findOne({ id: userId });
 
         if (!user) throw new NotFoundException();

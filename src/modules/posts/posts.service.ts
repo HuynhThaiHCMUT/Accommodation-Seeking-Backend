@@ -41,8 +41,8 @@ export class PostsService {
             postedAt: new Date(),
             postedBy: user,
         };
-        const createdPost = this.postsRepository.create(newPost);
-        await this.postsRepository.save(createdPost);
+        let createdPost = this.postsRepository.create(newPost);
+        createdPost = await this.postsRepository.save(createdPost);
         await this.usersRepository.update(user.id, { postCount: () => "postCount + 1" });
         return createdPost;
     }

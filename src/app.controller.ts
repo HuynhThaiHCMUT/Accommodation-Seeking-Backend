@@ -1,16 +1,19 @@
 import { Controller, Get, NotFoundException, Query } from '@nestjs/common';
 import { ProvinceDto, DistrictDto, CommuneDto } from './app.dto';
 import { AppService } from './app.service';
+import { Public } from './modules/auth/auth.guard';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
+  @Public()
   @Get('provinces')
   getProvinces(): ProvinceDto[] {
     return this.appService.getProvinces();
   }
 
+  @Public()
   @Get('districts')
   getDistricts(@Query('provinceId') idProvince: string): DistrictDto[] {
     const districts = this.appService.getDistrictsByProvince(idProvince);
@@ -20,6 +23,7 @@ export class AppController {
     return districts;
   }
 
+  @Public()
   @Get('communes')
   getCommunes(@Query('districtId') idDistrict: string): CommuneDto[] {
     const communes = this.appService.getCommunesByDistrict(idDistrict);
@@ -29,6 +33,7 @@ export class AppController {
     return communes;
   }
 
+  @Public()
   @Get('scheduler')
   getScheduler() {
     return { success: true };

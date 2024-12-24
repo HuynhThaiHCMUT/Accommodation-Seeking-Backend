@@ -7,6 +7,7 @@ import { UsersService } from './users.service';
 import { NoUserPostDto } from '../posts/post.dto';
 import { PostType } from '../posts/post.entity';
 import { PostsService } from '../posts/posts.service';
+import { Public } from '../auth/auth.guard';
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -17,6 +18,7 @@ export class UsersController {
         private readonly postsService: PostsService,
     ) {}
 
+    @Public()
     @Get(':id?') // Make the id parameter optional
     @ApiParam({ name: 'id', required: false, type: Number })
     @ApiOkResponse({ description: 'Get user info successfully', type: ResUserDto })
@@ -52,6 +54,7 @@ export class UsersController {
         return this.usersService.delete(req.user.id);
     }
 
+    @Public()
     @Get(':id/posts')
     @ApiQuery({ name: 'postType', required: true, type: String, enum: PostType })
     @ApiQuery({ name: 'offset', required: false, type: Number })

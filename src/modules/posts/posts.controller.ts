@@ -7,6 +7,7 @@ import { FilesUploadDto, NoUserPostDto, PostDto, ResPostDto, UpdatePostDto } fro
 import { PostsService } from './posts.service';
 import { PostType, RoomType } from './post.entity';
 import { Gender } from '../users/user.entity';
+import { Public } from '../auth/auth.guard';
 
 @ApiTags('posts')
 @ApiBearerAuth()
@@ -14,6 +15,7 @@ import { Gender } from '../users/user.entity';
 export class PostsController {
     constructor(private readonly postsService: PostsService) {}
 
+    @Public()
     @Get(':id')
     @ApiOkResponse({ description: 'Get post successfully', type: ResPostDto })
     @ApiUnauthorizedResponse({ description: 'Unauthorized'})
@@ -47,6 +49,7 @@ export class PostsController {
         return this.postsService.delete(id);
     }
 
+    @Public()
     @Get()
     @ApiQuery({ name: 'postType', required: true, type: String, enum: PostType })
     @ApiQuery({ name: 'offset', required: false, type: Number })
